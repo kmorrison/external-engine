@@ -242,9 +242,10 @@ class Engine:
         self.send(f"position fen {work['initialFen']} moves {' '.join(work['moves'])}")
 
         for key in ["movetime", "depth", "nodes"]:
-            if key in work:
+            if key in work and not self.args.infinite:
                 self.send(f"go {key} {work[key]}")
-                break
+        else:
+            self.send(f"go infinite")
 
         job_started.set()
 
@@ -279,6 +280,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, fromfile_prefix_chars='@')
     parser.add_argument("--name", default="Alpha 2", help="Engine name to register")
     parser.add_argument("--engine", help="Shell command to launch UCI engine", required=True)
+    parser.add_argument("--infinite", help="Disrespect movetime arg from lichess", required=False, action="store_true")
     parser.add_argument("--setoption", nargs=2, action="append", default=[], metavar=("NAME", "VALUE"), help="Set a custom UCI option")
     parser.add_argument("--lichess", default="https://lichess.org", help="Defaults to https://lichess.org")
     parser.add_argument("--broker", default="https://engine.lichess.ovh", help="Defaults to https://engine.lichess.ovh")
